@@ -188,7 +188,7 @@
         level: 2,
         bpm: 123,
         image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp',
-        audio: 'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/Golden.mp3'
+        audio: 'music/Golden.mp3'//'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/Golden.mp3'
       },
       {
         title: 'Soda Pop',
@@ -197,7 +197,7 @@
         level: 2,
         bpm: 126,
         image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp',
-        audio: 'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/Soda%20Pop.mp3'
+        audio: 'music/Soda Pop.mp3'//'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/Soda%20Pop.mp3'
       },
       {
         title: 'Takedown',
@@ -206,7 +206,7 @@
         level: 4,
         bpm: 140,
         image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp',
-        audio: 'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/Takedown.mp3'
+        audio: 'music/Takedown.mp3'//'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/Takedown.mp3'
       },
       {
         title: 'APT.',
@@ -215,7 +215,7 @@
         level: 4,
         bpm: 149,
         image: 'https://i.namu.wiki/i/bhah366XOA19iGgowPCmWqwNbnAnJCfje90lMWewHWqESaGJE-nOSKnZ4kMJpKVnzEUhu-xdH9IvWhAVkEquGmjORbGzdEY3OmT226QZE2m0ngKQmBnq2_n_RDszz2bNXk4kMbNYHXFeBsxFmikCXg.webp',
-        audio: 'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/APT.mp3'
+        audio: 'music/APT.mp3'//'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/APT.mp3'
       }
     ];
     let selectedSong = null;
@@ -266,7 +266,8 @@ function startGame() {
   document.getElementById('gameScreen').style.display = 'flex';
   document.getElementById('gameTitle').textContent = selectedSong.title + ' - ' + selectedLevel;
   document.getElementById('gameBPM').textContent = selectedSong.bpm;
-  fetch(`https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/pitchJson/${selectedSong.title}.json`)
+  //fetch(`https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/pitchJson/${selectedSong.title}.json`)
+  fetch(`pitchJson/${selectedSong.title}.json`)
     .then(res => res.json())
     .then(data => {
       noteData = data;
