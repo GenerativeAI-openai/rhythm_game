@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>역대 최고의 리듬게임</title>
   <style>
     body {
@@ -126,24 +126,37 @@
       color: white;
       font-size: 18px;
     }
-#judgeMessage {
-  font-size: 48px;
-  font-weight: 900;
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  transform: translateX(-50%) scale(1);
-  color: #fff700;
-  text-shadow: 2px 2px 8px #ff0, 0 0 20px #ff8000;
-  z-index: 10;
-  pointer-events: none;
-  opacity: 0;
-  transition: none; /* 애니메이션 제거 */
-}
-#judgeMessage.show {
-  opacity: 1;
-  transform: translateX(-50%) scale(1); /* 확대 효과 제거 */
-}
+    #judgeMessage {
+      font-size: 48px;
+      font-weight: 900;
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%) scale(1);
+      color: #fff700;
+      text-shadow: 2px 2px 8px #ff0, 0 0 20px #ff8000;
+      z-index: 10;
+      pointer-events: none;
+      opacity: 0;
+    }
+    #judgeMessage.show {
+      opacity: 1;
+    }
+    #resultScreen {
+      display: none;
+      text-align: center;
+      padding: 50px;
+      background: white;
+      height: 100vh;
+    }
+    #resultScreen h1 {
+      font-size: 36px;
+    }
+    #resultScreen button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -179,63 +192,27 @@
     </div>
   </div>
 
+  <div id="resultScreen">
+    <h1>게임 종료</h1>
+    <p>당신의 점수는 <span id="finalScore">0</span>점입니다!</p>
+    <button onclick="location.reload()">메인으로 돌아가기</button>
+  </div>
+
   <script>
     const songs = [
-      {
-        title: 'Golden',
-        artist: 'KPop Demon Hunters',
-        date: '2025.07.04',
-        level: 2,
-        bpm: 123,
-        image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp',
-        audio: 'music/Golden.mp3'
-      },
-      {
-        title: 'Soda Pop',
-        artist: 'KPop Demon Hunters',
-        date: '2025.06.20',
-        level: 2,
-        bpm: 126,
-        image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp',
-        audio: 'music/Soda Pop.mp3'
-      },
-      {
-        title: 'Takedown',
-        artist: 'KPop Demon Hunters',
-        date: '2025.06.20',
-        level: 4,
-        bpm: 140,
-        image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp',
-        audio: 'music/Takedown.mp3'
-      },
-      {
-        title: 'APT.',
-        artist: 'ROSE & Bruno Mars',
-        date: '2024.10.18',
-        level: 4,
-        bpm: 149,
-        image: 'https://i.namu.wiki/i/bhah366XOA19iGgowPCmWqwNbnAnJCfje90lMWewHWqESaGJE-nOSKnZ4kMJpKVnzEUhu-xdH9IvWhAVkEquGmjORbGzdEY3OmT226QZE2m0ngKQmBnq2_n_RDszz2bNXk4kMbNYHXFeBsxFmikCXg.webp',
-        audio: 'music/APT.mp3'
-      }
+      { title: 'Golden', artist: 'KPop Demon Hunters', date: '2025.07.04', level: 2, bpm: 123, image: '...', audio: 'music/Golden.mp3' },
+      { title: 'Soda Pop', artist: 'KPop Demon Hunters', date: '2025.06.20', level: 2, bpm: 126, image: '...', audio: 'music/Soda Pop.mp3' },
+      { title: 'Takedown', artist: 'KPop Demon Hunters', date: '2025.06.20', level: 4, bpm: 140, image: '...', audio: 'music/Takedown.mp3' },
+      { title: 'APT.', artist: 'ROSE & Bruno Mars', date: '2024.10.18', level: 4, bpm: 149, image: '...', audio: 'music/APT.mp3' }
     ];
-    let selectedSong = null;
-    let selectedLevel = 'EASY';
-    let combo = 0;
-    let totalNotes = 0;
-    let hitNotes = 0;
-    let score = 0;
+    let selectedSong = null, selectedLevel = 'EASY', combo = 0, totalNotes = 0, hitNotes = 0, score = 0;
 
     function renderSongList() {
       const list = document.getElementById('songList');
       songs.forEach((song, idx) => {
         const div = document.createElement('div');
         div.className = 'song-item';
-        div.innerHTML = `
-          <img src="${song.image}" alt="cover">
-          <div class="song-info">
-            <h3>${song.title}</h3>
-            <p>${song.artist}</p>
-          </div>`;
+        div.innerHTML = `<img src="${song.image}" alt="cover"><div class="song-info"><h3>${song.title}</h3><p>${song.artist}</p></div>`;
         div.addEventListener('click', () => selectSong(idx));
         list.appendChild(div);
       });
@@ -257,25 +234,27 @@
       const el = document.getElementById('judgeMessage');
       el.textContent = text;
       el.classList.add('show');
-      //setTimeout(() => el.classList.remove('show'), 1000);
+      setTimeout(() => el.classList.remove('show'), 600);
     }
 
-function startGame() {
-  if (!selectedSong) return alert('노래를 선택하세요.');
-  document.getElementById('selectScreen').style.display = 'none';
-  document.getElementById('gameScreen').style.display = 'flex';
-  document.getElementById('gameTitle').textContent = selectedSong.title + ' - ' + selectedLevel;
-  document.getElementById('gameBPM').textContent = selectedSong.bpm;
+    function startGame() {
+      if (!selectedSong) return alert('노래를 선택하세요.');
+      document.getElementById('selectScreen').style.display = 'none';
+      document.getElementById('gameScreen').style.display = 'flex';
+      document.getElementById('gameTitle').textContent = selectedSong.title + ' - ' + selectedLevel;
+      document.getElementById('gameBPM').textContent = selectedSong.bpm;
+      document.getElementById('score').textContent = '0';
+      combo = score = totalNotes = hitNotes = 0;
 
-  const audio = document.getElementById('audio');
-  audio.src = selectedSong.audio;
-  audio.load();
-  audio.addEventListener('canplaythrough', () => {
-    audio.play();
-    startNotes(selectedSong.bpm);
-  }, { once: true });
-}
-
+      const audio = document.getElementById('audio');
+      audio.src = selectedSong.audio;
+      audio.load();
+      audio.addEventListener('canplaythrough', () => {
+        audio.play();
+        startNotes(selectedSong.bpm);
+      }, { once: true });
+      audio.addEventListener('ended', showResult);
+    }
 
     function startNotes(bpm) {
       const interval = 60 / bpm;
@@ -306,43 +285,46 @@ function startGame() {
     }
 
     function hitPad(lane) {
-      const now = performance.now();
-      const notes = document.querySelectorAll(`.note[data-lane='${lane}']`);
-      for (const note of notes) {
-        const noteY = parseFloat(note.style.top);
-        const lineY = document.querySelector('.judgeline').offsetTop;
-        const timing = now - Number(note.dataset.createdAt);
-        const offset = Math.abs(noteY - lineY);
-        if (offset < 30) {
-          let judge = 'MISS';
-          let addScore = 0;
-          if (offset < 15) {
-            judge = 'PERFECT'; addScore = 1; combo++;
-          } else if (offset < 25) {
-            judge = 'GREAT'; addScore = 0.5; combo++;
-          } else {
-            judge = 'GOOD'; addScore = 0;
-          }
-          if (judge === 'MISS') combo = 0;
-          score += addScore * 900000 / totalNotes;
-          score += combo * (100000 / totalNotes);
-          document.getElementById('score').textContent = parseInt(score)
-          showJudge(`${judge}`);
-          hitNotes++;
-          note.remove();
-          break;
-        }
+      const notes = Array.from(document.querySelectorAll(`.note[data-lane='${lane}']`));
+      if (notes.length === 0) return;
+      const lineY = document.querySelector('.judgeline').offsetTop;
+
+      notes.sort((a, b) => Math.abs(parseFloat(a.style.top) - lineY) - Math.abs(parseFloat(b.style.top) - lineY));
+      const note = notes[0];
+      const noteY = parseFloat(note.style.top);
+      const offset = Math.abs(noteY - lineY);
+      let judge = 'MISS', addScore = 0;
+
+      if (offset < 15) { judge = 'PERFECT'; addScore = 1; combo++; }
+      else if (offset < 25) { judge = 'GREAT'; addScore = 0.5; combo++; }
+      else if (offset < 30) { judge = 'GOOD'; combo++; }
+      else { combo = 0; }
+
+      note.remove(); // MISS여도 삭제
+
+      if (judge !== 'MISS') {
+        score += addScore * 900000 / totalNotes;
+        score += combo * (100000 / totalNotes);
+        hitNotes++;
       }
+
+      document.getElementById('score').textContent = parseInt(score);
+      showJudge(judge);
     }
 
-    renderSongList();
+    function showResult() {
+      document.getElementById('gameScreen').style.display = 'none';
+      document.getElementById('resultScreen').style.display = 'block';
+      document.getElementById('finalScore').textContent = parseInt(score);
+    }
 
-    // 키보드 입력 추가: S, D, K, L → 0, 1, 2, 3
     document.addEventListener('keydown', (e) => {
       const map = { 's': 0, 'd': 1, 'k': 2, 'l': 3 };
       const key = e.key.toLowerCase();
       if (key in map) hitPad(map[key]);
     });
+
+    renderSongList();
   </script>
 </body>
 </html>
