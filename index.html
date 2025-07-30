@@ -126,24 +126,24 @@
       color: white;
       font-size: 18px;
     }
-#judgeMessage {
-  font-size: 48px;
-  font-weight: 900;
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  transform: translateX(-50%) scale(1);
-  color: #fff700;
-  text-shadow: 2px 2px 8px #ff0, 0 0 20px #ff8000;
-  z-index: 10;
-  pointer-events: none;
-  opacity: 0;
-  transition: none; /* 애니메이션 제거 */
-}
-#judgeMessage.show {
-  opacity: 1;
-  transform: translateX(-50%) scale(1); /* 확대 효과 제거 */
-}
+    #judgeMessage {
+      font-size: 48px;
+      font-weight: 900;
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%) scale(1);
+      color: #fff700;
+      text-shadow: 2px 2px 8px #ff0, 0 0 20px #ff8000;
+      z-index: 10;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    }
+    #judgeMessage.show {
+      opacity: 1;
+      transform: translateX(-50%) scale(1.8);
+    }
   </style>
 </head>
 <body>
@@ -165,30 +165,29 @@
   <div id="gameScreen">
     <h1 id="gameTitle"></h1>
     <p>BPM: <span id="gameBPM"></span></p>
-    <p>score: <span id="score"></span></p>
     <audio id="audio" style="display: none;"></audio>
     <div id="noteArea">
       <div class="judgeline"></div>
       <div id="judgeMessage"></div>
     </div>
     <div class="touch-pad">
-      <button class="pad-button" ontouchstart="hitPad(0)">S</button>
-      <button class="pad-button" ontouchstart="hitPad(1)">D</button>
-      <button class="pad-button" ontouchstart="hitPad(2)">K</button>
-      <button class="pad-button" ontouchstart="hitPad(3)">L</button>
+      <button class="pad-button" ontouchstart="hitPad(0)">A</button>
+      <button class="pad-button" ontouchstart="hitPad(1)">B</button>
+      <button class="pad-button" ontouchstart="hitPad(2)">C</button>
+      <button class="pad-button" ontouchstart="hitPad(3)">D</button>
     </div>
   </div>
 
   <script>
     const songs = [
-      {
+{
         title: 'Golden',
         artist: 'KPop Demon Hunters',
         date: '2025.07.04',
         level: 2,
         bpm: 123,
         image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp',
-        audio: 'music/Golden.mp3'//'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/Golden.mp3'
+        audio: 'music/Golden.mp3'
       },
       {
         title: 'Soda Pop',
@@ -197,7 +196,7 @@
         level: 2,
         bpm: 126,
         image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp',
-        audio: 'music/Soda Pop.mp3'//'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/Soda%20Pop.mp3'
+        audio: 'music/Soda Pop.mp3'
       },
       {
         title: 'Takedown',
@@ -206,7 +205,7 @@
         level: 4,
         bpm: 140,
         image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp',
-        audio: 'music/Takedown.mp3'//'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/Takedown.mp3'
+        audio: 'music/Takedown.mp3'
       },
       {
         title: 'APT.',
@@ -215,7 +214,7 @@
         level: 4,
         bpm: 149,
         image: 'https://i.namu.wiki/i/bhah366XOA19iGgowPCmWqwNbnAnJCfje90lMWewHWqESaGJE-nOSKnZ4kMJpKVnzEUhu-xdH9IvWhAVkEquGmjORbGzdEY3OmT226QZE2m0ngKQmBnq2_n_RDszz2bNXk4kMbNYHXFeBsxFmikCXg.webp',
-        audio: 'music/APT.mp3'//'https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/music/APT.mp3'
+        audio: 'music/APT.mp3'
       }
     ];
     let selectedSong = null;
@@ -252,44 +251,32 @@
     function selectLevel(level) {
       selectedLevel = level;
     }
-
     function showJudge(text) {
       const el = document.getElementById('judgeMessage');
       el.textContent = text;
-      el.classList.add('show');
-      //setTimeout(() => el.classList.remove('show'), 1000);
+      el.style.opacity = 1;
+      setTimeout(() => el.style.opacity = 0, 600);
     }
 
-function startGame() {
-  if (!selectedSong) return alert('노래를 선택하세요.');
-  document.getElementById('selectScreen').style.display = 'none';
-  document.getElementById('gameScreen').style.display = 'flex';
-  document.getElementById('gameTitle').textContent = selectedSong.title + ' - ' + selectedLevel;
-  document.getElementById('gameBPM').textContent = selectedSong.bpm;
-  //fetch(`https://github.com/GenerativeAI-openai/rhythm_game/raw/refs/heads/main/pitchJson/${selectedSong.title}.json`)
-  fetch(`pitchJson/${selectedSong.title}.json`)
-    .then(res => res.json())
-    .then(data => {
-      noteData = data;
+    function startGame() {
+      if (!selectedSong) return alert('노래를 선택하세요.');
+      document.getElementById('selectScreen').style.display = 'none';
+      document.getElementById('gameScreen').style.display = 'flex';
+      document.getElementById('gameTitle').textContent = selectedSong.title + ' - ' + selectedLevel;
+      document.getElementById('gameBPM').textContent = selectedSong.bpm;
       const audio = document.getElementById('audio');
       audio.src = selectedSong.audio;
-      audio.load();
-      audio.addEventListener('canplaythrough', () => {
-        audio.play();
-        startNotes();
-      }, { once: true });
-    });
-}
-
+      audio.play();
+      startNotes(selectedSong.bpm);
+    }
 
     function startNotes(bpm) {
       const interval = 60 / bpm;
       const noteArea = document.getElementById('noteArea');
-      const lineY = document.querySelector('.judgeline').offsetTop;
       setInterval(() => {
         const note = document.createElement('div');
         note.className = 'note';
-        const lane = Math.floor(Math.random() * 4);
+        const lane = Math.floor(Math.random()*4);
         note.dataset.lane = lane;
         note.dataset.createdAt = performance.now();
         note.style.top = '0px';
@@ -299,11 +286,9 @@ function startGame() {
         const drop = setInterval(() => {
           y += 2;
           note.style.top = y + 'px';
-          if (y > lineY) {
+          if (y > noteArea.offsetHeight) {
             clearInterval(drop);
             note.remove();
-            combo = 0;
-            showJudge('MISS');
           }
         }, 16);
         totalNotes++;
@@ -321,17 +306,19 @@ function startGame() {
         if (offset < 30) {
           let judge = 'MISS';
           let addScore = 0;
-          if (offset < 15) {
-            judge = 'PERFECT'; addScore = 1; combo++;
-          } else if (offset < 25) {
-            judge = 'GREAT'; addScore = 0.5; combo++;
-          } else {
+          if (offset < 10) {
+            judge = 'PERFECT'; addScore = 1;
+            combo++;
+          } else if (offset < 20) {
+            judge = 'GREAT'; addScore = 0.5;
+            combo++;
+          } else if (offset < 30) {
             judge = 'GOOD'; addScore = 0;
           }
           if (judge === 'MISS') combo = 0;
           score += addScore * 900000 / totalNotes;
           score += combo * (100000 / totalNotes);
-          document.getElementById('score').textContent = parseInt(score)
+          //showJudge(`${judge} | 콤보 ${combo}`);
           showJudge(`${judge}`);
           hitNotes++;
           note.remove();
@@ -341,13 +328,37 @@ function startGame() {
     }
 
     renderSongList();
+  </script>
 
-    // 키보드 입력 추가: S, D, K, L → 0, 1, 2, 3
-    document.addEventListener('keydown', (e) => {
-      const map = { 's': 0, 'd': 1, 'k': 2, 'l': 3 };
-      const key = e.key.toLowerCase();
-      if (key in map) hitPad(map[key]);
-    });
+  <script>
+    function startNotes(bpm) {
+      const interval = 60 / bpm;
+      const noteArea = document.getElementById('noteArea');
+      const lineY = document.querySelector('.judgeline').offsetTop;
+      setInterval(() => {
+        const note = document.createElement('div');
+        note.className = 'note';
+        const lane = Math.floor(Math.random() * 4);
+        note.dataset.lane = lane;
+        note.dataset.createdAt = performance.now();
+        note.style.top = '0px';
+        note.style.left = `${lane * 25}%`;
+        noteArea.appendChild(note);
+        let y = 0;
+        const drop = setInterval(() => {
+          y += 2;
+          note.style.top = y + 'px';
+          //if (y > lineY + 30) {
+            if (y > lineY - 10) {
+            clearInterval(drop);
+            note.remove();
+            combo = 0;
+            showJudge('MISS');
+          }
+        }, 16);
+        totalNotes++;
+      }, interval * 1000);
+    }
   </script>
 </body>
 </html>
