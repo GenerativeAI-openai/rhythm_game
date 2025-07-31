@@ -245,9 +245,11 @@
       document.getElementById('gameBPM').textContent = selectedSong.bpm;
       document.getElementById('score').textContent = '0';
       combo = score = totalNotes = hitNotes = 0;
-
+      
       const audio = document.getElementById('audio');
       audio.src = selectedSong.audio;
+      if (selectedLevel == 'EASY') audio.playbackRate = 1
+      if (selectedLevel == 'HARD') audio.playbackRate = 1.5
       audio.load();
       audio.addEventListener('canplaythrough', () => {
         audio.play();
@@ -257,7 +259,8 @@
     }
 
     function startNotes(bpm) {
-      const interval = 60 / bpm;
+      if (selectedLevel == 'EASY') const interval = 60 / bpm;
+      if (selectedLevel == 'HARD') const interval = 60 / (bpm * 1.5);
       const noteArea = document.getElementById('noteArea');
       const lineY = document.querySelector('.judgeline').offsetTop;
       setInterval(() => {
@@ -317,7 +320,10 @@
       document.getElementById('resultScreen').style.display = 'block';
       document.getElementById('finalScore').textContent = parseInt(score);
     }
-
+    function setSpeed(rate) {
+      const audio = document.getElementById("audio");
+      audio.playbackRate = rate;
+    }
     document.addEventListener('keydown', (e) => {
       const map = { 's': 0, 'd': 1, 'k': 2, 'l': 3 };
       const key = e.key.toLowerCase();
