@@ -142,22 +142,6 @@
     #judgeMessage.show {
       opacity: 1;
     }
-    #comboMessage {
-      font-size: 48px;
-      font-weight: 900;
-      position: absolute;
-      top: 20%;
-      left: 50%;
-      transform: translateX(-50%) scale(1);
-      color: #fff700;
-      text-shadow: 2px 2px 8px #ff0, 0 0 20px #ff8000;
-      z-index: 10;
-      pointer-events: none;
-      opacity: 0;
-    }
-    #comboMessage.show {
-      opacity: 1;
-    }
     #resultScreen {
       display: none;
       text-align: center;
@@ -198,7 +182,6 @@
     <audio id="audio" style="display: none;"></audio>
     <div id="noteArea">
       <div class="judgeline"></div>
-      <div id="comboMessage"></div>
       <div id="judgeMessage"></div>
     </div>
     <div class="touch-pad">
@@ -248,17 +231,11 @@
       selectedLevel = level;
     }
 
-    function showJudge(text, text2 = '') {
-      const comboEl = document.getElementById('comboMessage');
+    function showJudge(text) {
       const el = document.getElementById('judgeMessage');
       el.textContent = text;
-      comboEl.textContent = text2;
-      comboEl.classList.add('show');
       el.classList.add('show');
-      setTimeout(() => {
-        comboEl.classList.remove('show');
-        el.classList.remove('show');
-      }, 600);
+      setTimeout(() => el.classList.remove('show'), 600);
     }
 
     function startGame() {
@@ -334,6 +311,7 @@
       else if (offset < 25) { judge = 'GREAT'; addScore = 0.5; combo++; }
       else if (offset < 30) { judge = 'GOOD'; combo++; }
       else { combo = 0; }
+
       note.remove(); // MISS여도 삭제
 
       if (judge !== 'MISS') {
@@ -341,8 +319,9 @@
         score += combo * (100000 / totalNotes);
         hitNotes++;
       }
+
       document.getElementById('score').textContent = parseInt(score);
-      showJudge(judge, `COMBO ${combo}`);
+      showJudge(judge);
     }
 
     function showResult() {
