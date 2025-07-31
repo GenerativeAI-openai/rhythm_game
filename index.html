@@ -249,8 +249,12 @@
       
       const audio = document.getElementById('audio');
       audio.src = selectedSong.audio;
-      if (selectedLevel == 'EASY') audio.playbackRate = 1
-      if (selectedLevel == 'HARD') audio.playbackRate = 1.5
+      if (selectedLevel == 'EASY') {
+        audio.playbackRate = 1
+      }
+      if (selectedLevel == 'HARD') {
+        audio.playbackRate = 1.35
+      }
       audio.load();
       audio.addEventListener('canplaythrough', () => {
         audio.play();
