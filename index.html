@@ -259,8 +259,11 @@
     }
 
     function startNotes(bpm) {
-      if (selectedLevel == 'EASY') const interval = 60 / bpm;
-      if (selectedLevel == 'HARD') const interval = 60 / (bpm * 1.5);
+      if (selectedLevel == 'EASY') {
+        const interval = 60 / bpm;
+      } else if (selectedLevel == 'HARD') {
+        const interval = 60 / (bpm * 1.5);
+      }
       const noteArea = document.getElementById('noteArea');
       const lineY = document.querySelector('.judgeline').offsetTop;
       setInterval(() => {
