@@ -249,14 +249,15 @@
       
       const audio = document.getElementById('audio');
       audio.src = selectedSong.audio;
-      if (selectedLevel == 'EASY') {
-        audio.playbackRate = 1
-      }
-      if (selectedLevel == 'HARD') {
-        audio.playbackRate = 1.35
-      }
+      // if (selectedLevel == 'EASY') {
+      //   audio.playbackRate = 1
+      // }
+      // if (selectedLevel == 'HARD') {
+      //   audio.playbackRate = 1.35
+      // }
       audio.load();
       audio.addEventListener('canplaythrough', () => {
+        audio.playbackRate = selectedLevel === 'HARD' ? 1.35 : 1.0;
         audio.play();
         startNotes(selectedSong.bpm);
       }, { once: true });
