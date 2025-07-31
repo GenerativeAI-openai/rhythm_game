@@ -199,6 +199,7 @@
   </div>
 
   <script>
+    let interval;
     const songs = [
       { title: 'Golden', artist: 'KPop Demon Hunters', date: '2025.07.04', level: 2, bpm: 123, image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp', audio: 'music/Golden.mp3' },
       { title: 'Soda Pop', artist: 'KPop Demon Hunters', date: '2025.06.20', level: 2, bpm: 126, image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp', audio: 'music/Soda Pop.mp3' },
@@ -260,9 +261,9 @@
 
     function startNotes(bpm) {
       if (selectedLevel == 'EASY') {
-        const interval = 60 / bpm;
+        interval = 60 / bpm;
       } else if (selectedLevel == 'HARD') {
-        const interval = 60 / (bpm * 1.5);
+        interval = 60 / (bpm * 1.5);
       }
       const noteArea = document.getElementById('noteArea');
       const lineY = document.querySelector('.judgeline').offsetTop;
