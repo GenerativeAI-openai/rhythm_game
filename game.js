@@ -1,3 +1,4 @@
+
 let selectedSong = 'golden';
 let difficulty = 'easy';
 let combo = 0;
@@ -74,13 +75,11 @@ function detectPitch(buffer, sampleRate) {
   return -1;
 }
 
-function getPitch() {
+function getPitchNow() {
   const buffer = new Float32Array(analyser.fftSize);
   analyser.getFloatTimeDomainData(buffer);
   const p = detectPitch(buffer, audioContext.sampleRate);
-  if (p > 0) {
-    pitch = p;
-  }
+  return p > 0 ? p : -1;
 }
 
 function selectDifficulty(diff) {
@@ -99,7 +98,6 @@ function startGame() {
   source.connect(analyser);
   analyser.connect(audioContext.destination);
   analyser.fftSize = 2048;
-  setInterval(getPitch, 200);
 
   audio.play();
   spawnNotes();
@@ -117,8 +115,8 @@ function spawnNotes() {
     note.className = "note";
     note.style.top = "-40px";
 
-    // 🎯 롱노트 기준 완화: pitch > 320
-    const isLong = pitch > 320;
+    const currentPitch = getPitchNow();
+    const isLong = currentPitch > 320;
     const height = isLong ? 100 : 40;
     note.style.height = height + "px";
     note.dataset.long = isLong;
@@ -157,7 +155,7 @@ function handleNoteHit(note, fall) {
   if (note.isHit) return;
   const { spawnTime, isLong } = activeNotes.get(note) || {};
   const now = Date.now();
-  const delta = Math.abs(now - spawnTime - 1000); // 예측 도착 시간과 비교
+  const delta = Math.abs(now - spawnTime - 1000);
   let judgment = "GOOD";
   if (delta < 100) judgment = "PERFECT";
   else if (delta < 250) judgment = "GREAT";
@@ -165,7 +163,7 @@ function handleNoteHit(note, fall) {
   if (isLong) {
     note.style.background = "lime";
     note.dataset.held = "true";
-    return; // 판정은 release에서
+    return;
   }
 
   clearInterval(fall);
@@ -174,53 +172,6 @@ function handleNoteHit(note, fall) {
   showJudgment(judgment);
   updateScore(judgment);
 }
-// function handleNoteHit(note, fall, event) {
-//   if (note.isHit) return;
-//   const { spawnTime, isLong } = activeNotes.get(note) || {};
-//   const now = Date.now();
-//   const delta = Math.abs(now - spawnTime - 1000);
-//   let judgment = "GOOD";
-//   if (delta < 100) judgment = "PERFECT";
-//   else if (delta < 250) judgment = "GREAT";
-
-//   if (isLong) {
-//     note.dataset.held = "true";
-
-//     const greenOverlay = document.createElement("div");
-//     greenOverlay.style.position = "absolute";
-//     greenOverlay.style.left = "0";
-//     greenOverlay.style.width = "100%";
-//     greenOverlay.style.top = "100%";
-//     greenOverlay.style.height = "0%";
-//     greenOverlay.style.background = "lime";
-//     greenOverlay.style.pointerEvents = "none";
-//     greenOverlay.style.zIndex = "1";
-
-//     note.appendChild(greenOverlay);
-//     note.style.position = "relative";
-
-//     // Animate green overlay to grow upward
-//     const totalHeight = parseFloat(note.style.height);
-//     let currentHeight = 0;
-//     const greenGrow = setInterval(() => {
-//       if (!note.dataset.held || currentHeight >= totalHeight) {
-//         clearInterval(greenGrow);
-//         return;
-//       }
-//       currentHeight += 2;
-//       greenOverlay.style.top = (100 - (currentHeight / totalHeight * 100)) + "%";
-//       greenOverlay.style.height = (currentHeight / totalHeight * 100) + "%";
-//     }, 20);
-
-//     return;
-//   }
-
-//   clearInterval(fall);
-//   note.remove();
-//   activeNotes.delete(note);
-//   showJudgment(judgment);
-//   updateScore(judgment);
-// }
 
 function handleLongRelease(note) {
   if (note.dataset.held === "true") {
