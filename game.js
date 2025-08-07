@@ -117,8 +117,8 @@ function spawnNotes() {
     note.className = "note";
     note.style.top = "-40px";
 
-    // 길이 설정
-    const isLong = pitch > 500;
+    // 🎯 롱노트 기준 완화: pitch > 320
+    const isLong = pitch > 320;
     const height = isLong ? 100 : 40;
     note.style.height = height + "px";
     note.dataset.long = isLong;
@@ -144,12 +144,11 @@ function spawnNotes() {
       }
     }, 20);
 
-    // 클릭 판정
-    note.addEventListener("mousedown", () => handleNoteHit(note, fall));
-    note.addEventListener("touchstart", () => handleNoteHit(note, fall), { passive: true });
+    note.addEventListener("pointerdown", (e) => handleNoteHit(note, fall), { passive: false });
+    note.style.pointerEvents = "auto";
+
     if (isLong) {
-      note.addEventListener("mouseup", () => handleLongRelease(note));
-      note.addEventListener("touchend", () => handleLongRelease(note));
+      note.addEventListener("pointerup", () => handleLongRelease(note));
     }
   }, spawnInterval);
 }
@@ -158,7 +157,7 @@ function handleNoteHit(note, fall) {
   if (note.isHit) return;
   const { spawnTime, isLong } = activeNotes.get(note) || {};
   const now = Date.now();
-  const delta = Math.abs(now - spawnTime - 1000); // 1초 후 도착 가정
+  const delta = Math.abs(now - spawnTime - 1000); // 예측 도착 시간과 비교
   let judgment = "GOOD";
   if (delta < 100) judgment = "PERFECT";
   else if (delta < 250) judgment = "GREAT";
