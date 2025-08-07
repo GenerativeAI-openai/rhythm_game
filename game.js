@@ -1,9 +1,13 @@
 let selectedSong = 'golden';
 let difficulty = 'easy';
 let combo = 0;
+let score = 0;
 let audio;
 let bpm = 120;
 let gameInterval;
+let analyser, audioContext, source;
+let pitch = 0;
+let activeNotes = new Map();
 
 const songs = {
   golden: {
@@ -40,6 +44,45 @@ const songs = {
   }
 };
 
+function detectPitch(buffer, sampleRate) {
+  const SIZE = buffer.length;
+  let bestOffset = -1;
+  let bestCorrelation = 0;
+  let rms = 0;
+  for (let i = 0; i < SIZE; i++) {
+    const val = buffer[i];
+    rms += val * val;
+  }
+  rms = Math.sqrt(rms / SIZE);
+  if (rms < 0.01) return -1;
+  let lastCorrelation = 1;
+  for (let offset = 8; offset < 1000; offset++) {
+    let correlation = 0;
+    for (let i = 0; i < SIZE - offset; i++) {
+      correlation += Math.abs((buffer[i]) - (buffer[i + offset]));
+    }
+    correlation = 1 - (correlation / SIZE);
+    if (correlation > 0.9 && correlation > lastCorrelation) {
+      bestCorrelation = correlation;
+      bestOffset = offset;
+    }
+    lastCorrelation = correlation;
+  }
+  if (bestCorrelation > 0.9) {
+    return sampleRate / bestOffset;
+  }
+  return -1;
+}
+
+function getPitch() {
+  const buffer = new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(buffer);
+  const p = detectPitch(buffer, audioContext.sampleRate);
+  if (p > 0) {
+    pitch = p;
+  }
+}
+
 function selectDifficulty(diff) {
   difficulty = diff;
 }
@@ -50,6 +93,14 @@ function startGame() {
   const data = songs[selectedSong];
   bpm = data.bpm;
   audio = new Audio(data.src);
+  audioContext = new AudioContext();
+  source = audioContext.createMediaElementSource(audio);
+  analyser = audioContext.createAnalyser();
+  source.connect(analyser);
+  analyser.connect(audioContext.destination);
+  analyser.fftSize = 2048;
+  setInterval(getPitch, 200);
+
   audio.play();
   spawnNotes();
 }
@@ -65,11 +116,20 @@ function spawnNotes() {
     const note = document.createElement("div");
     note.className = "note";
     note.style.top = "-40px";
-    note.style.height = "40px";
+
+    // 길이 설정
+    const isLong = pitch > 500;
+    const height = isLong ? 100 : 40;
+    note.style.height = height + "px";
+    note.dataset.long = isLong;
+
     document.getElementById(`lane-${lane}`).appendChild(note);
 
     let pos = -40;
     const speed = difficulty === 'easy' ? 4 : 6;
+    const spawnTime = Date.now();
+    activeNotes.set(note, { spawnTime, isLong });
+
     const fall = setInterval(() => {
       pos += speed;
       note.style.top = pos + "px";
@@ -77,27 +137,67 @@ function spawnNotes() {
       if (pos >= window.innerHeight) {
         clearInterval(fall);
         note.remove();
+        activeNotes.delete(note);
         showJudgment("MISS");
         combo = 0;
         updateCombo();
       }
     }, 20);
 
-    // 판정: 누르는 순간 즉시
+    // 클릭 판정
     note.addEventListener("mousedown", () => handleNoteHit(note, fall));
     note.addEventListener("touchstart", () => handleNoteHit(note, fall), { passive: true });
+    if (isLong) {
+      note.addEventListener("mouseup", () => handleLongRelease(note));
+      note.addEventListener("touchend", () => handleLongRelease(note));
+    }
   }, spawnInterval);
 }
 
 function handleNoteHit(note, fall) {
-  if (!note.isHit) { // 중복 판정 방지
-    note.isHit = true;
-    clearInterval(fall);
-    note.remove();
-    showJudgment("PERFECT");
-    combo++;
-    updateCombo();
+  if (note.isHit) return;
+  const { spawnTime, isLong } = activeNotes.get(note) || {};
+  const now = Date.now();
+  const delta = Math.abs(now - spawnTime - 1000); // 1초 후 도착 가정
+  let judgment = "GOOD";
+  if (delta < 100) judgment = "PERFECT";
+  else if (delta < 250) judgment = "GREAT";
+
+  if (isLong) {
+    note.style.background = "lime";
+    note.dataset.held = "true";
+    return; // 판정은 release에서
   }
+
+  clearInterval(fall);
+  note.remove();
+  activeNotes.delete(note);
+  showJudgment(judgment);
+  updateScore(judgment);
+}
+
+function handleLongRelease(note) {
+  if (note.dataset.held === "true") {
+    note.remove();
+    activeNotes.delete(note);
+    showJudgment("PERFECT");
+    updateScore("PERFECT");
+  }
+}
+
+function updateScore(judgment) {
+  if (judgment === "MISS") {
+    combo = 0;
+  } else {
+    combo++;
+    let base = 0;
+    if (judgment === "PERFECT") base = 100;
+    else if (judgment === "GREAT") base = 60;
+    else if (judgment === "GOOD") base = 30;
+    score += base * Math.max(1, combo);
+  }
+  updateCombo();
+  updateScoreDisplay();
 }
 
 function showJudgment(text) {
@@ -115,6 +215,23 @@ function updateCombo() {
   comboBox.style.animation = "none";
   void comboBox.offsetWidth;
   comboBox.style.animation = "fadeout 1s ease-out forwards";
+}
+
+function updateScoreDisplay() {
+  let el = document.getElementById("score");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "score";
+    el.style.position = "absolute";
+    el.style.top = "5%";
+    el.style.right = "5%";
+    el.style.color = "white";
+    el.style.fontSize = "24px";
+    el.style.textShadow = "0 0 10px #fff";
+    el.style.zIndex = "99999";
+    document.body.appendChild(el);
+  }
+  el.innerText = "Score: " + score;
 }
 
 window.addEventListener("DOMContentLoaded", () => {
