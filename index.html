@@ -1,345 +1,37 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>역대 최고의 리듬게임</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #d8bfff, #a1c4fd);
-      color: #333;
-    }
-    .container {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    .song-list, .song-preview {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      box-sizing: border-box;
-    }
-    .song-item {
-      display: flex;
-      align-items: center;
-      padding: 12px;
-      margin-bottom: 12px;
-      background: #fff;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .song-item:hover {
-      transform: scale(1.02);
-    }
-    .song-item img {
-      width: 60px;
-      height: 60px;
-      border-radius: 10px;
-      margin-right: 12px;
-    }
-    .song-info h3 {
-      margin: 0 0 4px;
-      font-size: 16px;
-    }
-    .song-info p {
-      margin: 0;
-      font-size: 13px;
-      color: #777;
-    }
-    .song-preview {
-      text-align: center;
-    }
-    .song-preview img {
-      width: 150px;
-      height: 150px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-    }
-    .song-preview h2 {
-      margin: 8px 0 6px;
-      font-size: 20px;
-    }
-    .level-buttons button, .play-button {
-      padding: 10px 20px;
-      margin: 6px;
-      font-size: 16px;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-    }
-    .play-button {
-      background: linear-gradient(to right, #00f2ff, #00c3ff);
-      color: white;
-      font-weight: bold;
-    }
-    .level-buttons button {
-      background: #eee;
-    }
-    #gameScreen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: 100vh;
-      background: black;
-      color: white;
-      padding-top: 10vh;
-    }
-    #noteArea {
-      position: relative;
-      width: 100%;
-      height: 60vh;
-      background: #222;
-      margin-top: 20px;
-      overflow: hidden;
-    }
-    .note {
-      position: absolute;
-      width: 25%;
-      height: 20px;
-      background: cyan;
-      border-radius: 10px;
-    }
-    .judgeline {
-      position: absolute;
-      bottom: 12%;
-      height: 4px;
-      background: red;
-      width: 100%;
-    }
-    .touch-pad {
-      display: flex;
-      justify-content: space-around;
-      width: 100%;
-      margin-top: 10px;
-    }
-    .pad-button {
-      width: 25%;
-      height: 60px;
-      background: rgba(255, 255, 255, 0.2);
-      border: 2px solid white;
-      border-radius: 10px;
-      color: white;
-      font-size: 18px;
-    }
-    #judgeMessage {
-      font-size: 48px;
-      font-weight: 900;
-      position: absolute;
-      top: 30%;
-      left: 50%;
-      transform: translateX(-50%) scale(1);
-      color: #fff700;
-      text-shadow: 2px 2px 8px #ff0, 0 0 20px #ff8000;
-      z-index: 10;
-      pointer-events: none;
-      opacity: 0;
-    }
-    #judgeMessage.show {
-      opacity: 1;
-    }
-    #resultScreen {
-      display: none;
-      text-align: center;
-      padding: 50px;
-      background: white;
-      height: 100vh;
-    }
-    #resultScreen h1 {
-      font-size: 36px;
-    }
-    #resultScreen button {
-      font-size: 18px;
-      padding: 10px 20px;
-      margin-top: 20px;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Rhythm Game</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container" id="selectScreen">
-    <div class="song-list" id="songList"></div>
-    <div class="song-preview" id="songPreview">
-      <img id="previewImage" src="" alt="">
-      <h2 id="previewTitle"></h2>
-      <p id="previewArtist"></p>
-      <p id="previewDate"></p>
-      <div class="level-buttons">
-        <button onclick="selectLevel('EASY')">EASY</button>
-        <button onclick="selectLevel('HARD')">HARD</button>
+  <div class="main-container">
+    <div id="song-list" class="song-list"></div>
+
+    <div class="game-area">
+      <img id="cover" src="" alt="cover" />
+      <h2 id="title"></h2>
+      <p id="artist"></p>
+      <p id="date"></p>
+      <div class="difficulty">
+        <button onclick="selectDifficulty('easy')">EASY</button>
+        <button onclick="selectDifficulty('hard')">HARD</button>
       </div>
       <button class="play-button" onclick="startGame()">PLAY</button>
     </div>
   </div>
 
-  <div id="gameScreen">
-    <h1 id="gameTitle"></h1>
-    <p>BPM: <span id="gameBPM"></span></p>
-    <p>score: <span id="score"></span></p>
-    <audio id="audio" style="display: none;"></audio>
-    <div id="noteArea">
-      <div class="judgeline"></div>
-      <div id="judgeMessage"></div>
-    </div>
-    <div class="touch-pad">
-      <button class="pad-button" onclick="hitPad(0)">S</button>
-      <button class="pad-button" onclick="hitPad(1)">D</button>
-      <button class="pad-button" onclick="hitPad(2)">K</button>
-      <button class="pad-button" onclick="hitPad(3)">L</button>
-    </div>
+  <div class="play-field" id="play-field">
+    <div class="lane" id="lane-0"></div>
+    <div class="lane" id="lane-1"></div>
+    <div class="lane" id="lane-2"></div>
+    <div class="lane" id="lane-3"></div>
+    <div id="judgment"></div>
+    <div id="combo"></div>
   </div>
 
-  <div id="resultScreen">
-    <h1>게임 종료</h1>
-    <p>당신의 점수는 <span id="finalScore">0</span>점입니다!</p>
-    <button onclick="location.reload()">메인으로 돌아가기</button>
-  </div>
-
-  <script>
-    let interval;
-    const songs = [
-      { title: 'Golden', artist: 'KPop Demon Hunters', date: '2025.07.04', level: 2, bpm: 123, image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp', audio: 'music/Golden.mp3' },
-      { title: 'Soda Pop', artist: 'KPop Demon Hunters', date: '2025.06.20', level: 2, bpm: 126, image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp', audio: 'music/Soda Pop.mp3' },
-      { title: 'Takedown', artist: 'KPop Demon Hunters', date: '2025.06.20', level: 4, bpm: 140, image: 'https://i.namu.wiki/i/v9Y8nqojENaoF6w1vMrcafVxMIjOsl5gSK9l9rbzpXraNc5Re4-IK7EUt4f2Khe9Zh-OZEvucPGJYjbDoHdSwSJBL8XyHK7-9XSGZdMEMFCNOruMPP4E2FkD0PymIZQIICWtg2YnXiLDOW7hU8STOw.webp', audio: 'music/Takedown.mp3' },
-      { title: 'APT.', artist: 'ROSE & Bruno Mars', date: '2024.10.18', level: 4, bpm: 149, image: 'https://i.namu.wiki/i/bhah366XOA19iGgowPCmWqwNbnAnJCfje90lMWewHWqESaGJE-nOSKnZ4kMJpKVnzEUhu-xdH9IvWhAVkEquGmjORbGzdEY3OmT226QZE2m0ngKQmBnq2_n_RDszz2bNXk4kMbNYHXFeBsxFmikCXg.webp', audio: 'music/APT.mp3' }
-    ];
-    let selectedSong = null, selectedLevel = 'EASY', combo = 0, totalNotes = 0, hitNotes = 0, score = 0;
-
-    function renderSongList() {
-      const list = document.getElementById('songList');
-      songs.forEach((song, idx) => {
-        const div = document.createElement('div');
-        div.className = 'song-item';
-        div.innerHTML = `<img src="${song.image}" alt="cover"><div class="song-info"><h3>${song.title}</h3><p>${song.artist}</p></div>`;
-        div.addEventListener('click', () => selectSong(idx));
-        list.appendChild(div);
-      });
-    }
-
-    function selectSong(index) {
-      selectedSong = songs[index];
-      document.getElementById('previewImage').src = selectedSong.image;
-      document.getElementById('previewTitle').textContent = selectedSong.title;
-      document.getElementById('previewArtist').textContent = selectedSong.artist;
-      document.getElementById('previewDate').textContent = selectedSong.date;
-    }
-
-    function selectLevel(level) {
-      selectedLevel = level;
-    }
-
-    function showJudge(text) {
-      const el = document.getElementById('judgeMessage');
-      el.textContent = text;
-      el.classList.add('show');
-      setTimeout(() => el.classList.remove('show'), 600);
-    }
-
-    function startGame() {
-      if (!selectedSong) return alert('노래를 선택하세요.');
-      document.getElementById('selectScreen').style.display = 'none';
-      document.getElementById('gameScreen').style.display = 'flex';
-      document.getElementById('gameTitle').textContent = selectedSong.title + ' - ' + selectedLevel;
-      document.getElementById('gameBPM').textContent = selectedSong.bpm;
-      document.getElementById('score').textContent = '0';
-      combo = score = totalNotes = hitNotes = 0;
-      
-      const audio = document.getElementById('audio');
-      audio.src = selectedSong.audio;
-      // if (selectedLevel == 'EASY') {
-      //   audio.playbackRate = 1
-      // }
-      // if (selectedLevel == 'HARD') {
-      //   audio.playbackRate = 1.35
-      // }
-      audio.load();
-      audio.addEventListener('canplaythrough', () => {
-        audio.playbackRate = selectedLevel === 'HARD' ? 1.35 : 1.0;
-        audio.play();
-        startNotes(selectedSong.bpm);
-      }, { once: true });
-      audio.addEventListener('ended', showResult);
-    }
-
-    function startNotes(bpm) {
-      if (selectedLevel == 'EASY') {
-        interval = 60 / bpm;
-      } else if (selectedLevel == 'HARD') {
-        interval = 60 / (bpm * 1.5);
-      }
-      const noteArea = document.getElementById('noteArea');
-      const lineY = document.querySelector('.judgeline').offsetTop;
-      setInterval(() => {
-        const note = document.createElement('div');
-        note.className = 'note';
-        const lane = Math.floor(Math.random() * 4);
-        note.dataset.lane = lane;
-        note.dataset.createdAt = performance.now();
-        note.style.top = '0px';
-        note.style.left = `${lane * 25}%`;
-        noteArea.appendChild(note);
-        let y = 0;
-        const drop = setInterval(() => {
-          y += 2;
-          note.style.top = y + 'px';
-          if (y > lineY) {
-            clearInterval(drop);
-            note.remove();
-            combo = 0;
-            showJudge('MISS');
-          }
-        }, 16);
-        totalNotes++;
-      }, interval * 1000);
-    }
-
-    function hitPad(lane) {
-      const notes = Array.from(document.querySelectorAll(`.note[data-lane='${lane}']`));
-      if (notes.length === 0) return;
-      const lineY = document.querySelector('.judgeline').offsetTop;
-
-      notes.sort((a, b) => Math.abs(parseFloat(a.style.top) - lineY) - Math.abs(parseFloat(b.style.top) - lineY));
-      const note = notes[0];
-      const noteY = parseFloat(note.style.top);
-      const offset = Math.abs(noteY - lineY);
-      let judge = 'MISS', addScore = 0;
-
-      if (offset < 15) { judge = 'PERFECT'; addScore = 1; combo++; }
-      else if (offset < 25) { judge = 'GREAT'; addScore = 0.5; combo++; }
-      else if (offset < 30) { judge = 'GOOD'; combo++; }
-      else { combo = 0; }
-
-      note.remove(); // MISS여도 삭제
-
-      if (judge !== 'MISS') {
-        score += addScore * 900000 / totalNotes;
-        score += combo * (100000 / totalNotes);
-        hitNotes++;
-      }
-
-      document.getElementById('score').textContent = parseInt(score);
-      showJudge(judge);
-    }
-
-    function showResult() {
-      document.getElementById('gameScreen').style.display = 'none';
-      document.getElementById('resultScreen').style.display = 'block';
-      document.getElementById('finalScore').textContent = parseInt(score);
-    }
-    function setSpeed(rate) {
-      const audio = document.getElementById("audio");
-      audio.playbackRate = rate;
-    }
-    document.addEventListener('keydown', (e) => {
-      const map = { 's': 0, 'd': 1, 'k': 2, 'l': 3 };
-      const key = e.key.toLowerCase();
-      if (key in map) hitPad(map[key]);
-    });
-
-    renderSongList();
-  </script>
+  <script src="game.js"></script>
 </body>
 </html>
