@@ -1,4 +1,3 @@
-
 let selectedSong = 'golden';
 let difficulty = 'easy';
 let combo = 0;
@@ -116,7 +115,7 @@ function spawnNotes() {
     note.style.top = "-40px";
 
     const currentPitch = getPitchNow();
-    const isLong = currentPitch > 320;
+    const isLong = currentPitch > 250;
     const height = isLong ? 100 : 40;
     note.style.height = height + "px";
     note.dataset.long = isLong;
